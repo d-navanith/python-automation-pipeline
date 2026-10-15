@@ -1,0 +1,9 @@
+# Automation Essentials
+requests>=2.31.0
+pandas>=2.2.0
+openpyxl>=3.1.2
+
+# QA & Test Automation
+pytest>=8.0.0
+pytest-html>=4.1.0
+playwright>=1.42.0

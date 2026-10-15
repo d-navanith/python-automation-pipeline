@@ -1,0 +1,57 @@
+name: Automation & QA Pipeline
+
+# Triggers for this CI/CD pipeline:
+# 1. On git push or pull request to the main branch
+# 2. On a schedule: every weekday at 08:00 AM UTC
+# 3. Manually from the GitHub web UI (workflow_dispatch)
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 8 * * 1-5'
+  workflow_dispatch:
+
+jobs:
+  test-and-generate-reports:
+    name: Run QA Tests and Generate Reports
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out repository code into the runner
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Install Python in the cloud runner
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+
+      # Step 3: Install all required project dependencies
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      # Step 4: Run automated QA tests with pytest and generate HTML report
+      - name: Execute QA Test Suite
+        run: |
+          mkdir -p reports
+          pytest tests/ -v --html=reports/qa_test_report.html --self-contained-html
+
+      # Step 5: Execute the automated daily reporting pipeline
+      - name: Run Live Currency & Excel Reporter
+        run: |
+          python api_reporter.py
+
+      # Step 6: Upload test reports and generated spreadsheets as downloadable artifacts
+      - name: Upload Generated Reports
+        uses: actions/upload-artifact@v4
+        if: always() # Upload even if tests fail so you can inspect the failure report
+        with:
+          name: automation-execution-reports
+          path: reports/
+          retention-days: 14

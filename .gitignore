@@ -1,0 +1,16 @@
+# Python Virtual Environment
+.venv/
+env/
+ENV/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Local Generated Reports & Workspaces
+reports/*.xlsx
+reports/*.html
+demo_workspace/
+logs/
